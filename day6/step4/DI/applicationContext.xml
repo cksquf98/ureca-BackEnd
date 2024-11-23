@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+   <!-- 스프링컨테이너 : 객체의 관리(생성,소멸,DI)
+        스프링 프레임워크는 Bean컨테이너!!  ==> 빈(자바클래스)을 관리
+               주의) 클래스만 등록( 인터페이스나 추상클래스는 안됨 )
+       <XML기본>
+       ==> XML은 데이터를 저장하는 방식.
+           ==> 어떻게??
+              1. 시작태그와 끝태그안에 content로
+              2. 속성값으로
+   -->
+   <bean class="com.ureca.step4.DI.MessageBeanImp"
+   		 id="msgBean">
+	<!-- 
+   		 <생성자 주입>
+   		 constructor-arg Tag = 클래스 생성자 호출
+   		 	* 오버로딩 생성자의 경우 value를 통해 파라미터 전달
+	-->
+   		 <constructor-arg>
+			<value>신짜오</value>
+		 </constructor-arg>
+   		 
+   		 
+	<!-- 
+   		 <Setter 주입>
+   		 Property Tag = 클래스 내의 Setter메서드를 호출
+   		    * name 속성에 들어가는 값 앞에 set을 붙여서 메서드를 찾음
+   		    * 전달할 파라미터 데이터 = <value>태그 추가 or value 속성 추가
+	-->
+   		 <property name="name" value="나길동"></property>
+   		 
+   		 <property name="fo" ref="foi">
+			
+		 </property>
+   </bean>
+   
+   <bean class="com.ureca.step4.DI.FileOutputImp"
+   		 id="foi">
+   </bean>
+</beans>

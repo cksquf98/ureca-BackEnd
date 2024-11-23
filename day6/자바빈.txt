@@ -1,0 +1,8 @@
+자바빈(자바클래스) : 서로 관련성 있는 속성을 묶어주는 클래스
+ ==> DTO(Data Transfer Object),  VO(Value Object) 라는 이름으로도 사용
+ ==> 속성은 private선언
+ ==> 속성값을 접근할수 있는 public한 메소드 : getXXX(게터메소드),  setXXX(세터메소드)
+         ==>  public 필드의자료형 get+필드명( ) {  return 필드명; }
+         ==>  public void set+필드명(필드명과 같은 변수선언){ this.필드명 = 매개변수명; }
+         ==>  더하는 필드명의 첫글자는 대문자
+ ==> 추가) 기본생성자, 오버로딩생성자, toString()

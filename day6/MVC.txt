@@ -1,0 +1,60 @@
+model1(구분없이 필요한 내용들(절차적인요소들)을 프로그래밍)
+
+model2(내용,형식에 따라서 파일을 분류/분리해서 프로그래밍)
+----> 개발방식
+
+model
+----> 데이터
+
+<MVC Model2구조>
+1. Model(모델)
+   - 비즈니스로직과 관련된 부분 처리.
+   - 데이터베이스 관련로직 구현
+   - JSP Beans, EJB Component
+   - 애플리케이션의 데이터를 표현.
+   
+   
+  예)
+    class Calculator{
+	     public int plus(int su1, int su2){
+	         return su1+su2;
+	     }
+     }
+     ---> 데이터를 가공 처리
+     int result = plus(2,3);
+     
+     class Person{
+         String name;
+         int age;
+         String job;
+     }
+     ---> 서로 관련있는 속성을 클래스로 묶음 : JavaBeans
+     
+     class DBTest{
+     
+         public void insert(){
+         
+         }
+     }
+     ---> DB access하는 클래스
+   
+2. View(뷰)
+   - 사용자에게 알맞은 화면을 보여주는 역할 수행.
+   - JSP, CustomTag
+   - 데이터를 시각적으로 표현하는것.
+   역할)
+     1. 결과값 출력
+     2. 사용자 요구(버튼클릭: 음료수가 먹고싶다.)
+     3. 사용자 데이터 입력.
+   
+3. Controller
+   - 애플리케이션의 흐름제어나 사용자의 처리요청을 구현
+   - 사용자인증, 보안설정이라든지
+      전체 애플리케이션에 영향을 미치는 요소구현
+   - 사용자 요청에 알맞은 모델을 사용하고 
+      사용자에게 보여줄 뷰를 선택
+   - Servlet
+   - 사용자가 View(GUI)를 통해 입력을 하면 Model(데이터)을
+      변경해 주는것.
+      
+       
