@@ -1,0 +1,82 @@
+CRUD 하자~!!
+
+
+    C - Create   : insert
+    R - Read     : select
+    U - Update  : update
+    D - Delete   : delete
+
+<요청의 종류>
+- 입력폼 (단순 포워딩)
+- DB입력처리
+================== 1사이클
+
+- 리스트 (1.DB조회 2.포워딩)
+================== 2사이클
+
+#      입력처리   ------------> 리스트
+#                     리다이렉트
+
+- 수정폼 (1.DB조회 2.포워딩)
+- DB수정처리
+================== 3사이클
+
+#      수정처리   ------------> 리스트
+#                     리다이렉트
+
+- 삭제요청(액션) ----> DB삭제처리
+================== 4사이클
+
+#      삭제처리   ------------> 리스트
+#                     리다이렉트
+
+
+<요청 URL>
+/person/form    GET
+/person/form    POST
+/person/list       GET
+/person/upform GET
+/person/upform POST
+/person/delete   GET
+
+============================
+Project명: SpringPersonMVC
+
+최상위패키지명: com.ureca.person
+==>  / : 기본 ConextRoot
+
+com.ureca.person.controller
+com.ureca.person.dto
+com.ureca.person.model.repo
+com.ureca.person.model.service
+
+
+============================
+
++ 로그인/로그아웃
++ 파일 업로드
++ 페이징 처리  : 3중쿼리 ==> limit
+
+MyBatis ==> 동적SQL
+
+============================
+<단위테스트>
+객체주입 확인 
+==> service dao
+실행확인
+==> insert / select 
+
+<인터셉터 처리>
+입력/수정/삭제는 로그인사용자만 가능
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,923 @@
+<JSP> Java Server Page, 서버스크립트(jsp,php,asp)
+
+클라이언트(브라우저) 스크립트 : JavaScript
+서버(JVM) 스크립트   : JSP
+
+- 자바 웹 어플리케이션
+- 브라우저 서비스(뷰)를 담당하는 한 페이지를 표현
+- Servlet Container (ApacheTomcat)를 통해 실행.
+
+- HTML(CSS,JavaScript) + Java코드 
+  --------------------         -------
+        물                         기름
+      ------                      -------
+    브라우저 실행             JVM에서 실행
+    
+ ===> ★  누가 먼저 실행? Java코드 
+          
+- 내(HTML)안에 너(Java)있다
+        
+====================================================================
+<실행절차>
+1. jsp페이지 요청
+   http://ip:port/컨텍스트루트/경로/hello.jsp
+                 ----------
+                 ContextRoot==프로젝트명
+                 
+----------- 서버의 반응  -----------------------
+2. jsp페이지 존재 유무     ----무---->   404에러
+
+3. 매핑된 서블릿 클래스(hello_jsp.java)  존재 유무     -----무 ----> 생성
+    public class hello_jsp extends HttpServlet{
+        public void init(){}
+        public void service(HttpServletRequest request,
+                            HttpServletResponse response){
+            out.print("JSP페이지에서 작성된 HTML");                    
+        }
+        public void destroy(){}
+    }   
+
+4. 컴파일(hello_jsp.class) 유무   -----무----> 컴파일
+5. 메모리 적재 유무  ----무----> 메모리 로딩!!
+6. 최초 호출인 경우 init()메소드 호출
+7. service()메소드 호출
+
+===================================================================
+<JSP기본태그>   ---> JSP페이지(.jsp)내에서 자바코드를 식별하는 태그
+
+1. Declaration(선언) <%!      %>
+   <%!
+              멤버요소  ---> 변수선언, 변수선언과 동시에 초기화, 메소드 정의
+       int su;     (O)
+           su=10;  (X)
+       int su2=20; (O)
+       
+       public String getMsg(){
+         return "건강하세요~!!";
+       } -----> (O)  비권장!!
+       
+       System.out.println(su2);   ---->  메소드 호출(X) 
+           
+   %>
+
+
+2. Scriptlet(스크립트릿, 실행)  <%       %>
+   <%
+       service()메소드 안의 자바코드!!
+       - 변수선언, 변수초기화, 메소드호출, 조건문, 반복문, 자바주석문(//, /**/) 
+   
+       int su3;
+       int su4=40;
+           su=10;//멤버초기화
+           su3=30;//지역변수 초기화
+           
+       if(조건식){}
+       for(){}
+       System.out.println("안녕");           
+   %>
+
+3. Expression(표현식, 출력식) <%=      %>
+   <%= 데이터 %>    ----> 서블릿 코드에서 out.print(데이터); 변환!!
+   <%= 브라우저에 출력하고자 하는 데이터  %>
+         ---> 데이터, 변수명, 연산자,  (리턴값이 있는)메소드호출
+   
+   <%= 2+3 %>              -----> out.print(2+3); 
+   <%= "안녕" %>            -----> out.print("안녕");
+   <%= su4 %>              -----> out.print(su4);
+   <%= getMsg()  %>        -----> out.print(getMsg()); 
+   <%= getMsg(); %>        -----> out.print(getMsg(););  (X)
+
+4. Comment(주석,설명문)  <%--   --%>
+   <%-- JSP주석   --%>
+
+
+=======================================================================
+문제1) 화면에 조회수를 출력하시오. (count.jsp)
+     ===> 조회수: 1회
+   
+문제2) login_form.html에 입력된 데이터를 param_test.jsp에서 출력하시오.   
+   
+   <form>
+      <input type=text  name="id">
+      <input type=password name="pwd">
+      <input type=submit>
+   </form>
+   
+   
+   <%
+       String id= request.getParameter("id");
+       String pwd= request.getParameter("pwd");
+   %>
+   
+   전달 아이디: <%= id%>   
+   전달 비번: <%=pwd>
+   
+   ==>  전달 아이디: ${param.id}
+               전달 비번: ${param.pwd}
+   
+문제3) 화면에 계산기를 출력하시오.
+     ===> calc.jsp (HTML폼)
+     
+                 JSP 계산기
+  -----------------------------------------
+      su1    oper     su2      계산(버튼)            
+   
+     ---> 계산버튼 클릭시
+     ===> result.jsp (계산결과 출력)
+                 결과값: 2+3=5 
+                 
+
+
+<미션1>
+화면에 구구단을 출력하시오. ===> gugudan.jsp (<table>태그 사용)
+  2*1=2    3*1=3   .....................   9*1=9
+  
+  .............................................
+  2*9=18   3*9=27  .....................   9*9=81
+  
+  ==> <tr>태그 9개 생성
+      <td>태그가 각 행마다 8개 생성
+
+
+
+
+
+
+
+
+  
+=============================================================  
+<미션2>
+화면에 계산기를 출력하시오.
+  - calc.jsp로만 실행 (계산기폼과 계산결과가 한화면에 출력)  : CalcServlet클래스 참조
+  - request.getParameter("name")사용
+  - 기존 Calculator클래스 사용
+---> 계산버튼 클릭시
+       - 계산폼 밑으로 수평선<hr> 긋기
+       - 수평선 밑에 계산결과를 '파랑색'으로 "결과값: 2*3=6" 출력
+---> 만약 su1 또는 su2에 데이터가 입력되지 않았다면
+      '빨강색'으로 "데이터를 입력!!" 출력            
+---> 만약 su1 또는 su2에 숫자아닌값이 입력되었다면
+      '빨강색'으로 "숫자만 입력!!" 출력            
+---> 만약 oper가 '/'이고 su2가 '0'이 입력되었다면
+      '빨강색'으로 "0으로 나눌 수 없습니다!!" 출력
+
+      
+##########################################################################
+
+
+
+<JSP> JavaServerPage
+- 자바 웹 어플리케이션
+- 웹브라우저에 출력되는 화면을 표현
+- HTML(CSS,JavaScript)  + Java
+           ----------    ------
+                           물                  기름
+               클라이언트스크립트        서버스크립트                 
+          (브라우저실행)     (JVM실행)                                  
+
+실행순서)      2번                      1번
+
+
+※ 웹브라우저 사용자가  hello.jsp요청!!
+      ---> http://ip:port/[웹컨텍스트루트(프로젝트명)]/경로/페이지명
+      ---> http://192.168.0.96:8282/TomTest/0719/hello.jsp
+      
+--------------------------hello.jsp-----------------------------
+<html>
+  <head></head>
+  <body>
+     <%-- 나주석  --%>
+     <h3>안녕 JSP</h3>
+     <%  String str="비가와요~!!";   %>
+     <%= str  %>
+     <%  for(int i=0; i<3; i++) { %>
+            <br>좋아!!
+     <%  } %>
+  </body>
+</html>      
+----------------------------------------------------------------      
+      
+      
+==> 웹서버(ApacheTomcat)는 브라우저에 전달할  text를 생성!!
+    - 우선 <%  %>와 같은 자바관련된 코드들만 모아서 실행과 출력.
+    - 조건문 또는 반복문에 감싸지는 HTML(텍스트)는  Java반영됨.
+      
+<html>
+  <head></head>
+  <body>
+     
+     <h3>안녕 JSP</h3>
+     
+         비가와요~!!
+         <br>좋아!!
+         <br>좋아!!
+         <br>좋아!!
+  </body>
+</html>      
+
+------------------------------------------------------
+문제1) 자바스크립트에 있는 str값을 자바 영역에서 출력가능(사용가능)?
+     <script>
+         var str="나는 자바스크립트~!!";
+     </script>
+
+     <%= str %>
+     또는
+     <%  out.print(str); %>
+     ===> ??
+------------------------------------------------------
+문제2) 자바영역에 있는 str값을 자바스크립트 영역에서 출력가능(사용가능)?
+    <%  String str="오늘은 금요일!!";    %>
+    
+    <script>
+          document.write(str);  ==> 가능? 
+          alert(str);    ==> 가능?  
+    </script>
+    -------------------------------------------
+    <%  int su=300;    
+        String str="Friday";
+    %>
+    
+    <script>
+          document.write(su);  ==> 가능? 
+          document.write(<%=su%>);  ==  document.write(300);   ==> 가능? ㅇㅇ
+          
+          document.write(str);  ==> 가능? 
+          document.write(<%=str%>);  ==> 가능? 되긴한데 문제 발생
+                                               ==>document.write(Friday);   -  Friday를 변수명으로 인식 
+
+          document.write('<%=str%>');  ==> 가능? ㅇㅇ
+                                       ==>document.write('Friday');  
+    </script> 
+    
+
+
+==============================================================================
+
+<JSP기본태그>
+1. declaration
+   <%!        %>  서블릿(자바클래스) 변환시  멤버의 구성요소(필드,메소드)
+2. scriptlet
+   <%         %>  서블릿(자바클래스) 변환시  service()메소드 내에 들어갈 자바 코드
+                   ==> 메소드호출, 조건문, 반복문
+   
+3. expression
+   <%=  데이터      %>  서블릿(자바클래스) 변환시  service()메소드 내에 들어갈 자바 코드
+                  ==> out.print(데이터)변환!!
+4. comment
+   <%--     --%>  JSP설명문
+   
+   .html  ==>  HTML주석만 가능    
+   .jsp   ==>  HTML주석, JSP주석 가능
+  
+   <%  int su=200;  %>
+   <!-- <%  su+=200;  %>  -->
+   <%-- <%  su *= 2;  %>  --%>
+   
+   <%= su  %>   ==> ? 800 ==> 400
+
+======================================================================
+
+<JSP지시어(지시자)> : Directives
+ - JSP파일의 속성을 기술
+ - JSP컨테이너에 해당페이지를 어떻게 처리해야 하는지 전달하기 위한 내용을 담는다.
+ - 종류에는 page, include, taglib가 있음
+  <%@page       %>  (O)
+  <%@ page      %> (O)
+  <% @page      %>  (X)
+ 
+1. page지시어
+ 형식) 
+    <%@ page 속성명1="속성값" 속성명2="속성값" 속성명3="속성값" %>
+    
+    <%@ page 속성명1="속성값" %>
+    <%@ page 속성명2="속성값" %>
+    <%@ page 속성명3="속성값" %>
+
+      속성종류) 
+     contentType (text/html;charset=UTF-8) : JSP가 생성할 문서의 타입지정.
+     pageEncoding : JSP페이지 자체의 캐릭터 인코딩을 지정. 
+     import : JSP페이지에서 사용할 자바 클래스를 지정.
+        <%@page import="java.util.ArrayList" %>
+        <%@page import="java.util.Calendar" %>
+        
+        <%@page import="java.util.Calendar,java.util.ArrayList" %>
+         
+
+     session (true) : JSP페이지가 세션을 사용할 지의 여부 지정.
+     buffer (8kb) : JSP페이지의 출력버퍼크기를 지정.
+     autoFlush (true) : 출력버퍼가 다 찼을 경우 자동으로 버퍼에 있는 데이터를 출력.
+     errorPage    : JSP페이지 실행중 에러발생시 이동할 페이지 설정.
+     isErrorPage (false)  : 에러발생시 에러관련된 객체지원. 
+
+2. include지시어
+   형식)
+    <%@include file="경로명" %>
+
+3. taglib지시어 (외부에서 정의된 태그를 사용할 때)
+    형식)
+    <%@taglib uri="경로" prefix="접두사">
+    <%@taglib tagdir="경로" prefix="접두사">
+
+=============================================================================
+※JSP기본객체 (내장객체)
+ -JSP페이지내에서 자료형을 선언하지 않고 사용하는 객체
+   ---> <%  자바코드  %>
+        <%= 자바코드 %> 
+        
+        <%   out.print("안녕"); 
+             request.getParameter("addr");
+        %>
+        <%=  session.getId();  %>
+        
+public class MyServlet extends HttpServlet{
+
+    public void service(HttpServletRequest request,
+                        HttpServletResponse response){
+                        
+     PageContext pageContext = new PageContext();
+     HttpSession session = new HttpSession();
+     ServletContext application = new ServletContext();
+     ServletConfig config = new ServletConfig(); 
+     JspWriter out = new JspWriter();
+     Object page = new Object();
+        ===> JSP가 준비하는 기본객체 
+        ===> request,response, pageContext, session, application, config,out,page                  
+
+        out.print("안녕");
+        request.getParameter("addr");
+        out.print(session.getId());                
+    }//service
+
+}        
+        
+        
+
+종류)
+  1. request(javax.servlet.http.HttpServletRequest)
+    - HTML폼요소의 선택값 등 사용자 입력정보를 읽어 올 때 사용.
+
+주요메소드)
+    getParameter(String name)
+      - 문자열 name과 같은 이름을 가진 파라미터의 값 얻어오기
+      
+      
+        ★setAttribute(String key, Object value);    ==> 데이터 저장
+        ★getAttribute(String key);                  ==> 데이터 조회
+    ==> ★★영역(scope)객체들이 공통적으로 사용.
+        -------------
+        page[Context],request,session,application
+    ==> 영역내에 데이터(숫자,문자열,Beans,ArrayList)를 저장, 조회하는 역할    
+        
+      
+    getParameterNames();  
+      
+      
+    getCookies()
+      - 모든 쿠기값을 javax.servlet.http.Cookie의 배열형태로 얻어오기
+    getMethod()
+      - 요청방식을 문자열로 얻어오기 ("GET","POST")
+    getSession()
+      - 현재 세션객체 얻어오기
+    getRemoteAddr()
+      - 클라이언트의 IP주소 얻어오기
+    getProtocol()
+      - 현재 서버의 프로토콜을 문자열 형태로 얻어오기
+    setCharacterEncoding("문자집합명")
+     - HTML 폼에서 한글 입력시 정상적으로 처리해주기 위해 설정.
+     - POST로 전달된 한글을 처리하기 위해 사용.        
+    
+ <Request한글 처리>
+    요청페이지로 부터 얻는 (한글)데이터에 대한 문자집합 설정
+      ==> request를 통해 (폼을 통해)전달된 한글에 대한 처리(한글깨짐 방지)    
+      ==> request.setCharacterEncoding("문자집합");
+      
+      ※주의)
+   1. 그 어떤 request.getParameter("name"); 보다 먼저 설정!!
+   2. 전달 받는 방식을 POST!!
+   3. request(HTML)에 정의된 문자집합과 일치하는 설정(setCharacterEncoding)을 해야함!!
+      
+         input.jsp                            print.jsp
+   ---------------------------------    --------------------------------------      
+    <%@page pageEncoding="UTF-8">        request.setCharacterEncoding("UTF-8");      
+    <%@page pageEncoding="euc-kr">       request.setCharacterEncoding("euc-kr");
+
+2. response(java.servlet.http.HttpServletResponse)
+    - 사용자 요청에 대한 응답을 처리하기 위해 사용.
+    
+    주요메소드)
+     setContentType(type)
+       - 문자열형태의 type에 지정된 MIME Type으로 contentType을 설정.
+     setHeader(name,value)
+       - 문자열 name의 이름으로 문자열 value의 값을 헤더로 설정.
+     setDateHeader(name,date)
+       - 문자열 name의 이름으로 date에 설정된 밀리세컨드 시간 값을 
+          헤더에 설정.
+     sendError(status, msg)
+       - 오류코드를 세팅하고 메시지를 보낸다.
+     sendRedirect(url)  ★
+       - 클라이언트 요청을 다른 페이지로 보낸다.(페이지 이동) 
+
+<페이지간 이동>  a.jsp   ----->   b.jsp
+
+  - HTML   : <a href="이동경로b.jsp">텍스트 또는 이미지</a>
+             <form action="이동경로"> <input type="submit"> <button> </form>
+             
+  - JavaScript: location.href="이동할경로";
+                replace("이동할경로")                
+                               폼이름.submit();  ---> 폼태그내의 action에 명시된 경로로 이동!!
+                               
+  - JSP ★
+     a. 포워드 이동
+           pageContext.forward();       ===> JSP페이지에서만 사용
+           requestDispatcher.forward(); ===> JSP와 Servlet 둘 다 사용 가능!!
+                  특징) 브라우저에 출력되는 페이지와 URL에 명시된 페이지가 서로 다름.
+              URL에 명시된 페이지와 이동한 페이지간에 request를 공유.
+     
+     b. 리다렉트 이동                            
+           response.sendRedirect("이동경로");
+                  특징) 브라우저에 출력되는 페이지와 URL에 명시된 페이지가 서로 같음.
+              URL에 명시된 페이지와 이동한 페이지간에 session를 공유.    
+
+
+####################################################################
+
+<JSP영역객체> ★★★
+  pageContext (page)  : 현재페이지
+  request             : 요청페이지와 응답페이지   (forward이동했을때의 호출한페이지와 호출된페이지)
+  session             : 동일 브라우저
+  application         : 동일 서버 (정확히는 같은 서버의 동일 Context)
+  (ServletContext)
+  
+  구분: ServletContext application 
+          - Web Application(웹응용프로그램, 프로젝트), 전체서블릿
+      ServletConfig  config
+          - 한개의 서블릿을 의미
+  
+※ JSP기본객체(내장객체)
+ - JSP내에서 자료형을 선언하지 않고 사용하는 객체.
+ - <%   %>,  <%=     %>  에서 사용
+
+종류)
+1. request(javax.servlet.http.HttpServletRequest)
+   - HTML폼요소의 선택값 등 사용자 입력 정보를 읽어 올 때 사용.
+
+2. response(java.servlet.http.HttpServletResponse)
+   - 사용자 요청에 대한 응답을 처리하기 위해 사용.    
+
+3. pageContext(javax.servlet.jsp.PageContext)  - 페이지개념, 영역객체
+   - 현재 JSP실행에 대한 context정보를 참조하기 위해 사용.
+   - 서블릿 클래스에서는 사용하지 못함.
+   
+   pageContext.getOut();
+   pageContext.getRequest();
+   pageContext.getSession();
+   pageContext.getServletContext();
+   
+4. session(javax.servlet.http.HttpSession) ★★
+   (세션 == 접속)
+      
+---> 브라우저를 통해 URL요청을 했을때 서버에서는 각브라우저를 식별할수 있는 번호를 부여!! 
+       서버측 메모리에 기억하고 있다가 브라우저가 또다른 (URL)요청을 할 때 같은 Client인지 비교.
+    
+    - 클라이언트에 대한 세션정보를 처리하기 위해 사용.
+    - 비연결형 프로토콜 HTTP
+      (한 페이지가 출력된 다음에 서버와 클라이언트 연결은 끊어짐.)에 대해
+            마치 계속 연결되어있는 것처럼 해주는 메커니즘.
+    - 쿠키는 사용자PC에 세션은 서버에 사용자와 관련된 정보를 보관.   
+   
+   세션의 사용용도)
+    - 사용자 로그인
+    - 쇼핑몰에서 장바구니 기능 구현
+    - 사용자가 어떤 페이지를 다녀갔는지 웹 페이지 트래킹 기능을 구현.
+    
+   주요메소드)
+      getId()
+        - 각 접속에 대한 세션 고유의 ID를 문자열형태로 리턴.
+      getCreatingTime()
+        - 세션이 생성된 시간을 long형 밀리세컨드 값으로 리턴
+          (January 1, 1970 GMT기준)
+      getLastAccessedTime()
+        - 현재 세션으로 마지막 작업한 시간을 long형 밀리세컨드 값으로 리턴.
+      getMaxInactiveInterval()
+        - 세션의 유지시간을 초로 반환.
+      setMaxInactiveInterval(t)
+        - 세션의 유효시간을 t에 설정된 초 값으로 설정.
+
+      invalidate() ★
+        - 현재 세션을 종료.
+        - 로그아웃에서 사용.
+        
+      setAttribute(key, value)
+        - 문자열 key으로 Object value을 설정.
+          
+      getAttribute(key)
+        - 문자열 key로 설정된 세션 값을 Object형태로 반환.
+        
+      removeAttribute(key)
+        - 문자열 key로 설정된 Object 삭제.      
+=======================================================================
+<세션 장바구니>
+login.jsp        ----> 로그인 화면 (사용자 이름만 입력)
+selProduct.jsp   ----> 상품을 선택하는 화면 (추가버튼 클릭)
+add.jsp          ----> 선택한 상품에 대해 세션(장바구니역할)에 추가 : 장바구니에 상품추가!!
+checkOut.jsp     ----> 선택한 상품들에 대한 상품목록 보이기
+-----------------------------------------------------------------------
+  <미션>
+   1. selProduct.jsp  ---> 로그인폼(login.jsp)에 입력된 이름을 출력
+   2. add.jsp         ---> alert(선택된 과일이름 출력), ArrayList에 과일추가
+   3. checkOut.jsp    ---> 선택된 상품들을 브라우저에 출력, ArrayList에 저장된 과일 출력  
+                        
+   [HINT]
+    - getParameter();
+    - setAttribute();
+    - getAttribute();
+    - ArrayList
+    
+==========================================================================
+<세션로그인>
+sessionT1.jsp  ---> 로그인 화면
+sessionT2.jsp  ---> 로그인 체크 (로그인 처리)
+sessionT3.jsp  ---> 서비스 화면
+sessionT4.jsp  ---> 로그아웃     (로그아웃 처리)
+
+1. sessionT2.jsp
+   ---> 로그인 화면을 통해 전달된 아이디와 비번을 DB(Map)와 비교검사
+           ---> 아이디가 존재하지 않거나 비번이 일치하지 않을 시 로그인 화면으로 이동
+   ---> 로그인 성공시 세션을 부여(세션로그인!!)
+                 예) session.setAttribute("login","success");
+
+2. sessionT3.jsp
+   ---> 정상적이지 않은 경로(로그인을 거치지 않은 상태에서 바로 sessionT3.jsp페이지 호출)
+               를 통해 접근 했을 시 로그인 화면으로 이동.
+   
+3. sessionT4.jsp
+   ---> 세션 해제 실행.
+   
+
+=====================================================================
+<알자!!>
+----------------------------------------------
+   hello.jsp?uname=홍길동&age=13
+   
+   String uname = request.getParameter("uname");
+          -----
+                     홍길동
+                     
+   String  age = request.getParameter("age");
+          -----
+           13
+                     
+   String  job = request.getParameter("job");
+          -----
+           null  ==> job키 없음!!, job파라미터 없음!!
+----------------------------------------------
+  <form>
+       <input type='text' name='username'><br>
+       <input type='text' name='useraddr' value='역삼역'><br>
+       <button>전송</button>
+  </form>
+
+   String  userName = request.getParameter("username");
+           --------
+                        빈문자열""
+    
+   String  userAddr = request.getParameter("useraddr");
+           --------
+                       역삼역
+   
+   String  happy = request.getParameter("happy");
+           ----- 
+           null
+
+----------------------------------------------
+   session.setAttribute("action","동에번쩍");
+   session.setAttribute("clock","벌써12시");
+
+   String action = (String)session.getAttribute("action");
+          ------
+                   동에번쩍
+          
+   String clock = (String)session.getAttribute("clock");
+          -----
+                   벌써12시
+          
+   String hobby = (String)session.getAttribute("hobby");
+          -----
+          null
+
+
+----------------------------------------------
+※JSP기본객체(내장객체)  
+   
+종류)
+1. request(javax.servlet.http.HttpServletRequest)
+    - HTML폼요소의 선택값 등 사용자 입력 정보를 읽어 올 때 사용.         
+    
+2. response(java.servlet.http.HttpServletResponse)
+    - 사용자 요청에 대한 응답을 처리하기 위해 사용. 
+          
+3. pageContext(javax.servlet.jsp.PageContext)    - 페이지 개념, 영역객체
+    - 현재 JSP실행에 대한 context정보를 참조하기 위해 사용.
+    - 서블릿 클래스에서는 사용하지 못함.
+
+4. session(javax.servlet.http.HttpSession)
+   (세션 == 접속)
+    ---> 브라우저를 통해 URL요청을 했을때 서버에서는 각브라우저를 식별할수 있는 번호를 부여!! 
+              서버측 메모리에 기억하고 있다가 브라우저가 또다른 (URL)요청을 할 때 같은 Client인지 비교.
+    
+    - 클라이언트에 대한 세션정보를 처리하기 위해 사용.
+    - 비연결형 프로토콜 HTTP
+      (한 페이지가 출력된 다음에 서버와 클라이언트 연결은 끊어짐.)에 대해
+       마치 계속 연결되어있는 것처럼 해주는 메커니즘.
+    - 쿠키는 사용자PC에 세션은 서버에 사용자와 관련된 정보를 보관.
+
+   
+5. application(javax.servlet.ServletContext)
+    - 웹서버의 애플리케이션 처리와 관련된 정보를 참조하기 위해 사용.
+    
+    개발자를 위한 서버정보)
+      getServerInfo()
+        - JSP/서블릿 컨테이너의 이름과 버전을 리턴
+      getMajorVersion()
+        - 컨테이너가 지원하는 서블릿 API의 Major버전정보 리턴
+      getMinorVersion()
+        - 컨테이너가 지원하는 서블릿 API의 Minor버전정보 리턴
+    
+    서버자원정보)
+      getMimeType(filename)
+        - 지정된 파일에 대한 MIME Type을 리턴
+      getResource(path)
+        - path에 지정된 자원을 URL객체로 리턴
+      getResourceAsStream(path)
+        - path에 지정된 자원을 InputStream객체로 리턴
+      getRealPath(path)
+        - path에 지정된 자원의 파일시스템의 실제 경로 리턴
+        
+           ※ 영역객체종류
+       - pageContext
+           pageContext.getRequest();
+       - request
+           request.getSession();
+       - session
+           session.getServletContext();
+       - application
+      ===> ServletContext application 
+                 = request.getSession().getServletContext(); 
+                    
+        
+      getContext(path)
+        - path에 지정된 자원의 컨텍스트 정보를 리턴
+      getRequestDispatcher(path)
+        - path에 지정된 자원을 위한 request dispatcher를 생성
+        
+    로그관련정보)
+      log(message)
+        - 문자열 message의 내용을 로그 파일에 기록.
+      log(message, exception)
+        - 예외상황에 대한 정보를 포함하여 로그 파일에 기록.
+  
+6. out(javax.servlet.jsp.JspWriter)
+    - 사용자에게 전달하기 위한 output스트림을 처리.
+    - 브라우저 출력객체
+    
+    주요메소드)
+    getBufferSize()
+      - 출력버퍼의 크기를 byte로 알려준다.
+    getRemaining()
+      - 남아있는 버퍼의 크기 중 사용 가능한 비율을 알려준다.
+    clearBuffer()
+      - 버퍼에 있는 컨텐츠를 모두 지운다.
+    flush()
+      - 버퍼를 비우고 output stream도 비운다.
+    close()
+      - output stream을 닫고 버퍼를 비운다.
+    println(content)
+      - content내용을 newline과 함께 출력
+    print(content)
+      - content내용을 출력
+7. config(javax.servlet.ServletConfig)
+    - 현재 JSP에 대한 초기화 환경을 처리하기 위해 사용.
+8. page(java.lang.Object)
+    - 현재 JSP페이지에 대한 클래스정보.
+9. exception(java.lang.Throwable)
+    - 예외 처리를 위해 사용.  
+
+
+===================================================================       
+※ JSP액션(Action)
+  - JSP페이지간 흐름 제어
+  - 자바애플릿 지원
+  - 자바빈즈 컴포넌트와 JSP상호 작용지원
+  
+액션종류)
+  1. include : 다른 페이지를 현재 페이지에 포함시킨다.
+     <jsp:include page="포함될 페이지 경로"/>
+                    ---> 포함될 페이지를 먼저 실행하고
+                                                   그 결과를 현재페이지에 포함!!     
+     
+     <%@include  file="포함될 페이지 경로"  %> 
+                      ---->현재페이지에  먼저 포함, 전체 컴파일!!
+       ※주의) <jsp:include>
+          ===> 태그명? include
+          ===> 'jsp:'  ?    접두사 prefix
+          ===> 확장자 jsp문서내에 prefix붙는 태그는 전부 '자바요소'를 태그로 표현한 것!!
+          ===> JVM에서 실행
+          ===> 시작과 끝이 명확해야 함!!
+                 <jsp:include>     ==> 시작태그만 명시했을 때 에러!!
+                 <jsp:include></jsp:include>   (O)    
+                 <jsp:include/>                (O)    
+              
+  2. forward : 현재페이지의 제어를 다른 페이지로 전달.
+              (페이지 이동)
+        형식)
+      <jsp:forward page="이동할 페이지 경로"/>    
+  
+  3. useBean : 클래스 객체를 생성하고 사용할 범위를 지정.
+        형식)
+      <jsp:useBean  class="pack.A" id='obj' />
+              ===> 의미 :    A  obj = new A();
+      <%  A  obj = new A();  %>
+      
+      <jsp:useBean  class="pack.A" id='obj' scope="page"/>
+      <jsp:useBean  class="pack.A" id='obj' scope="request"/>
+         <%
+             A obj;
+             if(request영역에 obj라는 A클래스 객체가 존재하지 않는 다면){
+                 obj = new A();
+                 request.setAttribute("obj",obj);
+             }else{
+                 obj = request.getAttribute("obj");
+             }
+          %>
+      <jsp:useBean  class="pack.A" id='obj' scope="session"/>
+      <jsp:useBean  class="pack.A" id='obj' scope="application"/>
+       
+      <영역 scope속성>
+         scope='page' (기본값)
+             - 현 페이지에서만 객체 사용 
+         scope='request' 
+             - request호출 관계에 있는 페이지간의 객체 공유
+               (forward를 통한 페이지 이동을 했을 경우)
+         scope='session' 
+             - 동일브라우저(같은 세션간의)내에 표시되는 페이지간의 객체 공유
+         scope='application' 
+             - 동일 서버내(동일 Context-TomTest)에서 서비스되어지는 
+                             모든 페이지간의 객체 공유
+       
+  4. setProperty : useBean의 세터메소드 호출
+      <jsp:setProperty name="useBean에서 사용한 id"
+                       property="속성명" value="데이터"/>
+  
+  5. getProperty : useBean의 게터메소드 호출
+      <jsp:getProperty name="useBean에서 사용한 id"
+                       property="속성명" />
+
+     예) <jsp:useBean class="test.Person" id="p"/>
+          -----> test.Person p = new test.Person();
+         
+      <jsp:setProperty name="p" property="age"  value="13"/>
+          -----> p.setAge(Integer.parseInt("13"));    
+      <jsp:getProperty name="p" property="age" />   
+          -----> out.print(p.getAge());
+
+===========================================================================
+<<표현언어>> Expression Language : EL  ★
+ - 처음 JSTL(JSP Standard Tag Library)에서 소개
+      현재 JSP스펙에 포함되어 사용.
+ - 자바빈즈 속성 값을 보다 쉽고 제약을 덜 받은 방법으로 사용하기 위해 나온 것.
+ - JSP파일이 useBean액션태그나 표현식등으로 복잡해 지는 것을 막고
+      일종의 템플릿코드처럼 사용할 수 있도록 해줌. 
+ 
+ 문법)
+   - 표현언어는 '$'로 시작
+   - 모든 내용을  '{표현식}'과 같이 구성
+         ====> ${            }                    ※참고: <script>  $(     ) </script> : jQuery
+         ----------                          ---------
+            JAVA                              JavaScript
+    
+   - 표현식에는 기본적으로 변수명 혹은  '키명.속성명' 구조를 갖는다.
+                               ----
+                                                영역객체.setAttribute("키값",vo);
+                          request.setAttribute("p", vo);
+                          ===> ${p.name}                                                
+   
+   - 표현식에 부가적으로 숫자, 문자열, boolean, null과 같은 상수값도 가능.
+   - 표현식에는 기본적인 연산가능.         
+            
+     <%
+         int su=10;
+     %>      
+           
+     <script>  var i=<%= su %>;   </script>
+     <input type=text value=<%= su%>  name=age>
+     
+     
+     <%    <%= su%>    ${  }         %>      
+           -------     -----
+              X           X
+           
+       속성접근)
+      ${person.name}   또는  ${person["name"]}  :  out.print(person.getName()) 
+      ${row[0]} : row라는 이름의 컬렉션의 첫번째 아이템
+      
+      ---> 데이터를 영역에 저장
+           request.setAttribute("p" , new Person("길동"));
+           
+      ---> 데이터를 영역에서 조회
+           Person p = (Person)request.getAttribute("p");
+           out.print(p.getName());
+           
+      ---> 위의 두 줄을 EL로 표현  : ${p.name}
+        
+            ${sessionScope.p.name}   <=== request와 session영역에 공통적으로 'p'키값이 정의       
+   
+     내장객체)
+    pageScope, requestScope, sessionScope, applicationScope,
+    param, paramValues, header, headerValues, initParam, cookie, pageContext         
+           
+           
+           <%
+             out.print(데이터);  ----> JSP페이지내에서는 out에 대한 자료형 선언을 하지 않았다.
+           %>
+           
+           ${ param.username }
+           ----->  String name = request.getParameter("username");
+                        out.print(name);             
+===================================================================================== 
+<커스텀 태그> Custom(사용자 정의) Tag
+- JSP페이지에서 반복적인 프로그램 로직을 캡슐화하기 위해 고안.
+- 기본적으로 제공되는 태그 이외에 사용자가 확장한 태그라는 의미에서
+  붙여진 이름.
+  
+ 커스텀태그 사용이유)
+   1. 비즈니스 로직으로부터 화면 표현을 분리
+   2. 비즈니스 로직의 캡슐화
+   3. 보다 손쉬운 웹 페이지 제작
+      
+ 종류)
+   JSP 1.2커스텀태그      
+   JSP 2.0커스텀태그   
+ 
+<JSP 1.2커스텀태그 요소>
+1. 태그 핸들러 클래스(Tag Handler Class)   .class
+   - 자바 클래스 파일로 태그의 동작을 구현해놓은 파일.   
+   
+2. 태그 라이브러리 기술자(Tag Library Descriptor)  .tld (XML문법)
+   - 태그이름등 태그 정보 및 태그 핸들러 클래스와의 관계를 기술.
+
+3. TagSupport
+   - doStartTag() : 시작태그를 만날 때 호출
+   - doEndTag()   : 끝태그를 만날 때 호출
+   - doAfterBody() : 태그바디가 있을 때 처리를 위해 자동호출  
+ 
+예제) WEB-INF/classes/MyTagHandler.class
+     WEB-INF/tld/myTag.tld     ----------> 여러개의 태그 정의, 각 태그에 매핑할 클래스 정의
+     
+<<tld스키마>>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">      
+-------------------------------------------------------------------------------- 
+<JSP 2.0커스텀태그 요소>
+1. 태그파일         .tag
+   - 몇가지 제약사항을 제외하고 대부분 JSP파일과 동일한 구성을 갖음.
+   - WEB-INF/tags 폴더에 저장.  
+   
+예) WEB-INF/tags/juwon.tag    ----------> 파일명 == 태그명,  태그에 매핑할 로직 정의
+
+==================================================================================
+<JSTL> JSP Standard Tag Library 표준태그 라이브러리
+- JSP페이지에서 많이 사용되는 논리적인 판단, 반복처리, 포맷처리를 위한
+  커스텀 태그를 표준으로 만들어서 정의한 것.
+  
+- https://mvnrepository.com
+     --------> 검색: jstl
+     
+종류)
+ 1. 코어(변수지원, 흐름제어, URL처리)
+   - http://java.sun.com/jsp/jstl/core
+ 
+ 2. XML (XML코어, 흐름제어, XML변환)
+   - http://java.sun.com/jsp/jstl/xml
+   
+ 3. 국제화 (지역, 메시지형식, 숫자 및 날짜 형식)
+   - http://java.sun.com/jsp/jstl/fmt
+   
+ 4. 데이터베이스(SQL)
+   - http://java.sun.com/jsp/jstl/sql
+   
+ 5. 함수(컬렉션 처리, String 처리)  
+   - http://java.sun.com/jsp/jstl/functions
+   
+<코어태그>
+1. 변수지원 : set, remove   
+            JSP페이지 안에서 ----->  <c:set>   <c:remove>  
+            
+2. 흐름제어 : if, choose, forEach, forTokens
+
+3. URL처리 : import, redirect, url
+
+4. 기타 : catch, out    
